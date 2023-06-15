@@ -1,0 +1,11 @@
+*.suo
+*.userosscache
+*.sln.docstates
+*.csproj.user
+*.userprefs
+[Bb]in/
+[Oo]bj/
+
+.vs/
+.idea/
+*.ffs_db

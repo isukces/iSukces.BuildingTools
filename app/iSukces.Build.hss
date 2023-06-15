@@ -1,0 +1,68 @@
+// using System.IO;
+
+bool updateVersionOnly = true;
+const string PackageId = "iSukces.Build";
+const string project   = PackageId;
+
+var builder = new ProjectBuilder
+{
+    VisualStudioExe = GlobalVar["MsBuild 2022"],
+    Nuget =
+    {
+        Exe            = GlobalVar["Nuget"],
+        RepositoryDir  = GlobalVar["Private Nuget Repository"],
+        ForceNugetName = PackageId
+    },
+
+    SolutionName       = "iSukces.BuildingTools",
+    ProjectName        = project,
+    // SolutionDir        = CombinePath(ConfigDir, "..", "app", PackageId),
+    SolutionDir        = ConfigDir,
+    ProjectDirTemplate = "{SolutionDir}\\" + PackageId,
+    CompileLog         = project + "-compile-" + PackageId + ".log",
+    UseProjectsVersionsFile = false
+};
+WorkingDir = builder.SolutionDir;
+
+
+// task: Update version
+if (updateVersionOnly) {
+    builder.UpdateVersionCore(VersionNumberStyles.YearMonthDay);
+    return;
+}
+var version = CsProjectCore.FromFile(builder.CsProjFileName).PackageVersion;
+
+
+
+
+// Execute( builder.VisualStudioExe, sln, "/clean");
+// task: Clean
+DeleteDir(builder.ProjectDir + "\\bin", builder.ProjectDir + "\\obj");
+
+// task: Nuget restore
+Execute(builder.Nuget.Exe, "restore " + builder.SolutionName + ".sln");
+
+// task: Build
+builder.MsBuild();
+
+// task: Copy nuget
+
+// var nugetOut = CombinePath(builder.Nuget.RepositoryDir, builder.Nuget.GetNugetPackageShortFile(version));
+
+var nugetOuts = new[]
+{
+    builder.Nuget.RepositoryDir,
+    @"E:\Dropbox\#AlpexOprogramowanie\NUGET",
+};
+foreach (var i in nugetOuts)
+foreach (var n in new[] { PackageNameOptions.Normal, PackageNameOptions.SNupkg })
+{
+    var shortName = builder.Nuget.GetNugetPackageShortFile(version, n);
+
+    var nugetPackageFileName = CombinePath(builder.Nuget.CompiledNugetOutputDir, shortName);
+    var nugetOut             = CombinePath(i, shortName);
+    Console.WriteLine("Copy {0} to {1}", nugetPackageFileName, nugetOut);
+    File.Copy(nugetPackageFileName, nugetOut, true);
+}
+
+Console.WriteLine("--FINISHED--");

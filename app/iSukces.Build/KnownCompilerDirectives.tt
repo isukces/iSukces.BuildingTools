@@ -1,0 +1,65 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Linq" #>
+<#
+    var items = @"
+
+0612 The class designer marked a member with the Obsolete attribute.
+0618 A class member was marked with the Obsolete attribute
+1591 Missing XML comment for publicly visible type or member
+8603 Possible null reference return.
+86251 Cannot convert null literal to non-nullable reference type
+";
+#>
+
+namespace iSukces.Build
+{
+    public static class KnownCompilerDirectives
+    {
+        #region Fields
+
+<#
+    foreach (var i in items.Split('\r', '\n').Select(a => a.Trim()))
+    {
+        if (string.IsNullOrWhiteSpace(i))
+            continue;
+        var x = i.IndexOf(' ');
+        var code = i.Substring(0, x);
+        var desc = i.Substring(x + 1).Trim();
+        var name = Info.GetName(code, desc);
+        WriteLine("        /// <summary>");
+        WriteLine("        /// " + desc);
+        WriteLine("        /// </summary>");
+        WriteLine($"        public const string {name} = \"{code}\";");
+
+        WriteLine("");
+    }
+#>
+ 
+        #endregion
+    }
+}
+
+<#+
+    class Info
+    {
+        private static string Camelize(string desc)
+        {
+            var items = desc.Split(' ', '-').Select(a => a.Trim().TrimEnd('.'))
+                .Where(a => a.Length > 0)
+                .Select(a =>
+                {
+                    if (string.Equals(a, "a", StringComparison.OrdinalIgnoreCase)) return "";
+                    if (string.Equals(a, "the", StringComparison.OrdinalIgnoreCase)) return "";
+                    if (string.Equals(a, "XML", StringComparison.OrdinalIgnoreCase))
+                        return "Xml";
+                    return a.Substring(0, 1).ToUpper() + a.Substring(1);
+                });
+            return string.Join("", items);
+        }
+
+        public static object GetName(string code, string desc)
+        {
+            return "Cs" + code + Camelize(desc);
+        }
+    }
+#>
