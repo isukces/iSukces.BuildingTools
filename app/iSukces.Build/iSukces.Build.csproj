@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Copyright>Copyright © Internet Sukces Piotr Stęclik 2021-2023</Copyright>
     <ProjectGuid>{79C5AD43-FE71-40BB-9A88-C809B2AFE008}</ProjectGuid>
-    <TargetFrameworks>net48;net7.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <LangVersion>11</LangVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>c:\programs\narzedzia\sign\iSukcesCodeSign.snk</AssemblyOriginatorKeyFile>
@@ -17,9 +17,9 @@
     <PackageProjectUrl>https://github.com/isukces/iSukces.BuildingTools</PackageProjectUrl>
     <RepositoryUrl>https://github.com/isukces/iSukces.BuildingTools</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AssemblyVersion>1.23.615.1</AssemblyVersion>
-    <Version>1.23.615.1</Version>
-    <FileVersion>1.23.615.1</FileVersion>
+    <AssemblyVersion>1.23.819.2</AssemblyVersion>
+    <Version>1.23.819.2</Version>
+    <FileVersion>1.23.819.2</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeSource>false</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
@@ -33,7 +33,7 @@
     <WarningsAsErrors>0659,0661,105,108,1570,1572,1574,1587,162,168,169,1718,1734,219,3245,414,628,649,693,8321</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="iSukces.Code" Version="1.0.23111.199" />
+    <PackageReference Include="iSukces.Code" Version="1.23.819.200" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
