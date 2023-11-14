@@ -95,12 +95,13 @@ public class InnoSetupFile
         File.WriteAllText(fileName, s, encoding);
     }
 
-    public string SetVersionsAndOutputBaseFilename(string version, string prefix, string outFolder)
+    public string SetVersionsAndOutputBaseFilename(string version, string prefix, string outFolder, string versionSeparator = "_")
     {
         this["Setup", "VersionInfoVersion"]        = version;
         this["Setup", "VersionInfoProductVersion"] = version;
         this["Setup", "AppVersion"]                = version;
-        var output = prefix + version.Replace(".", "_");
+        var version2 = versionSeparator == "." ? version : version.Replace(".", versionSeparator);
+        var output   = prefix + version2;
         this["Setup", "OutputBaseFilename"] = output;
         this["Setup", "OutputDir"]          = outFolder;
         return Path.Combine(outFolder, output + ".exe");
