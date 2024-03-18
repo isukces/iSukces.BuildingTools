@@ -131,6 +131,10 @@ public sealed class CompilerDirectiveUpdater
         //list = list.Where(a => !a.Contains(noAmmyUpdate)).ToHashSet();
     }
 
+    #region Fields
+
     private readonly CommandLine _cl;
     private readonly DirectoryInfo _solutionDir;
+
+    #endregion
 }

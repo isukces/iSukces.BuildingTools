@@ -10,16 +10,6 @@ public class MsBuild
         var par      = new CommandLineParameters();
         par.Add(solution.Name);
 
-        void AddP(string name, string value, bool quote = false)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return;
-            if (quote)
-                value = BuildUtils.Quote(value);
-            value = $"/p:{name}={value}";
-            par.Add(value);
-        }
-
         AddP("Configuration", Configuration);
         AddP("NoWarn", NoWarn, true);
         if (LogLevel.HasValue)
@@ -33,10 +23,26 @@ public class MsBuild
         // AddP("DefineConstants", "HOT,TRACE;DEVELOPER;JETBRAINS_ANNOTATIONS;NETFRAMEWORK;NO_LIVE_LANGUAGE_CHANGE;PIPELINEDESIGNER", true);
 
         var pList = par.ToArray();
+        LastCommand          = Exe + " " + string.Join(" ", pList);
         ExeRunner.WorkingDir = solution.Directory.FullName;
         ExeRunner.Execute(Exe, pList);
+        return;
         // "DF92B99D71C141BC924736C9107D1783"
+
+        void AddP(string name, string value, bool quote = false)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+            if (quote)
+                value = BuildUtils.Quote(value);
+            value = $"/p:{name}={value}";
+            par.Add(value);
+        }
     }
+
+    #region Properties
+
+    public string LastCommand { get; private set; }
 
     public string Exe { get; set; }
 
@@ -49,6 +55,8 @@ public class MsBuild
 
     public bool             Multiple { get; set; }
     public MsBuildLogLevel? LogLevel { get; set; }
+
+    #endregion
 }
 
 public enum MsBuildLogLevel

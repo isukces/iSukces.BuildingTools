@@ -7,15 +7,9 @@ namespace iSukces.Build;
 
 public static class ExConsole
 {
-    private static string Background(ConsoleColor c)
-    {
-        return Escape + "b" + ((int)c).ToString("X2");
-    }
+    private static string Background(ConsoleColor c) => Escape + "b" + ((int)c).ToString("X2");
 
-    public static string Foreground(ConsoleColor c)
-    {
-        return Escape + "f" + ((int)c).ToString("X2");
-    }
+    public static string Foreground(ConsoleColor c) => Escape + "f" + ((int)c).ToString("X2");
 
     private static string? GetColor(object value)
     {
@@ -108,9 +102,15 @@ public static class ExConsole
         }
     }
 
+    #region Properties
+
     public static string Reset => Escape + "r";
 
     public static string ForegroundRed => Foreground(ConsoleColor.Red);
+
+    #endregion
+
+    #region Fields
 
     const string ParameterFilter = @"\{([^}]+)}";
 
@@ -118,4 +118,6 @@ public static class ExConsole
 
     static readonly Regex ParameterRegex =
         new Regex(ParameterFilter, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    #endregion
 }

@@ -10,4 +10,4 @@
 .idea/
 *.ffs_db
 app/prv/
-app/build-debug.bat
+app/*.bat

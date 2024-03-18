@@ -6,10 +6,7 @@ namespace iSukces.Build;
 
 public class CsProjFile
 {
-    private CsProjFile(XDocument doc)
-    {
-        Doc = doc;
-    }
+    private CsProjFile(XDocument doc) => Doc = doc;
 
 
     public static int GetDayNumber()
@@ -18,16 +15,13 @@ public class CsProjFile
 
         return d.Month * 100 + d.Day;
         /*
-        
+
         var first = new DateTime(d.Year, 1, 1);
         return (d.Year - 2000) * 1000 + (int)d.Subtract(first).TotalDays + 1;
         */
     }
 
-    public static CsProjFile Load(string iFullName)
-    {
-        return new CsProjFile(XDocument.Load(iFullName));
-    }
+    public static CsProjFile Load(string iFullName) => new(XDocument.Load(iFullName));
 
 
     public static string UpdateVersion(string? x)
@@ -95,5 +89,9 @@ public class CsProjFile
         pNode.Add(new XElement(name, version));
     }
 
+    #region Properties
+
     public XDocument Doc { get; }
+
+    #endregion
 }

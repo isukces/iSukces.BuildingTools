@@ -8,6 +8,10 @@ public sealed class DirectorySynchronizeItem
         Flags  = flags;
     }
 
+    #region Properties
+
     public string    Folder { get; }
     public SyncFlags Flags  { get; }
+
+    #endregion
 }

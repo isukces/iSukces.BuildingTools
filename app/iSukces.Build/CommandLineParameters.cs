@@ -11,10 +11,11 @@ public class CommandLineParameters
         _list.Add(BuildUtils.Encode(s));
     }
 
-    public string[] ToArray()
-    {
-        return _list.ToArray();
-    }
+    public string[] ToArray() => _list.ToArray();
+
+    #region Fields
 
     private readonly List<string> _list = new();
+
+    #endregion
 }

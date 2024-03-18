@@ -22,10 +22,7 @@ public class IlMergeOptions
         BuildUtils.Clear(directoryInfo);
     }
 
-    private bool Accept(string name)
-    {
-        return !Exclude.Contains(name);
-    }
+    private bool Accept(string name) => !Exclude.Contains(name);
 
     public void Add(string fileName)
     {
@@ -61,10 +58,7 @@ public class IlMergeOptions
         return Files.Skip(1).ToArray();
     }
 
-    public string GetCommandLine(string out1)
-    {
-        return string.Join(" ", GetCommandLineArguments(out1));
-    }
+    public string GetCommandLine(string out1) => string.Join(" ", GetCommandLineArguments(out1));
 
     public string[] GetCommandLineArguments(string outputFilename, bool newLine = true, bool addIlMergeExe = true)
     {
@@ -124,10 +118,7 @@ public class IlMergeOptions
         return l.ToArray();
     }
 
-    public IReadOnlyList<string> GetFilesToDelete()
-    {
-        return Files.Concat(Remove).Distinct(StringComparer.InvariantCultureIgnoreCase).ToArray();
-    }
+    public IReadOnlyList<string> GetFilesToDelete() => Files.Concat(Remove).Distinct(StringComparer.InvariantCultureIgnoreCase).ToArray();
 
     public void Run()
     {
@@ -225,6 +216,8 @@ public class IlMergeOptions
         }
     }
 
+    #region Properties
+
     public string InternalizeExclude { get; set; }
 
     public string OutputExe { get; set; }
@@ -246,9 +239,15 @@ public class IlMergeOptions
     public IlMergeTarget Target      { get; set; }
     public string        KeyFile     { get; set; }
 
+    #endregion
+
+    #region Fields
+
     protected string Dir;
 
     protected readonly List<string> Files = new();
     private readonly Dictionary<string, string> _replaceFiles = new(StringComparer.InvariantCulture);
     private readonly List<string> _replaceFrom = new();
+
+    #endregion
 }

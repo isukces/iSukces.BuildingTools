@@ -4,17 +4,23 @@ using System.IO;
 
 namespace iSukces.Build;
 
-public class Config
+public class BuildConfig
 {
-    private Config()
-    {
-    }
-
     public string GetCompiledBinary()
     {
         var tmp = CompiledBinary?.Replace("{0}", BuildConfiguration.ToString());
         return tmp;
     }
+
+
+    public BuildConfig WithNoWarn(IEnumerable<string> codes)
+    {
+        foreach (var i in codes)
+            NoWarn.Add(i);
+        return this;
+    }
+
+    #region Properties
 
     public List<string> ProcessesToKillBeforeCompile { get; } = new List<string>();
 
@@ -28,7 +34,7 @@ public class Config
 
     public List<DirectorySynchronizeItem> OutputFolders { get; } = new List<DirectorySynchronizeItem>();
 
-    public static Config Instance => ConfigHolder.SingleIstance;
+    // public static Config Instance => ConfigHolder.SingleIstance;
 
     public DebugOrRelease BuildConfiguration { get; set; }
 
@@ -48,7 +54,7 @@ public class Config
     public HashSet<string> NoWarn  { get; }      = new();
     public string          Nuget   { get; set; } = "nuget.exe";
 
-    public IlMergeConfig IlMerge { get; set; }
+    public IlMergeConfig? IlMerge { get; set; }
 
     public string  RarExe                { get; set; }
     public string  RarOutput             { get; set; }
@@ -59,8 +65,8 @@ public class Config
 
     public string InstallationFolder { get; set; }
 
-    private static class ConfigHolder
-    {
-        public static readonly Config SingleIstance = new Config();
-    }
+    // public bool UseIlMerge     { get; set; }
+    public bool UpdateVersions { get; set; }
+
+    #endregion
 }

@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace iSukces.Build;
 
-public class BuildingScriptBase
+public class BuildingScriptBase : IRollbackContainer
 {
-    protected BuildingScriptBase(Config cfg)
+    protected BuildingScriptBase(BuildConfig configuration)
     {
-        Cfg = cfg;
+        Configuration = configuration;
         List<string> items = new();
-        if (!string.IsNullOrEmpty(cfg.MainProjectFolder))
-            items.AddRange(cfg.MainProjectFolder.Split('\\', '/'));
-        var tmp = cfg.GetCompiledBinary();
+        if (!string.IsNullOrEmpty(configuration.MainProjectFolder))
+            items.AddRange(configuration.MainProjectFolder.Split('\\', '/'));
+        var tmp = configuration.GetCompiledBinary();
         if (!string.IsNullOrEmpty(tmp))
             items.AddRange(tmp.Split('\\', '/'));
         CompiledBinariesDir = SlnDir(items.ToArray());
@@ -35,30 +36,55 @@ public class BuildingScriptBase
 
     protected void A03_Compile()
     {
-        var start = DateTime.Now;
-        var msBuild = new MsBuild
+        var start   = DateTime.Now;
+        var msBuild = new MsBuild();
+        try
         {
-            Exe           = Cfg.MsBuild,
-            Configuration = Cfg.BuildConfiguration.ToString().ToUpper(),
-            Multiple      = true,
-            Solution      = Path.Combine(Cfg.SlnDir.FullName, Cfg.SolutionShortFileName),
-            Target        = "Clean",
-            NoWarn        = string.Join(",", Cfg.NoWarn.OrderBy(a => a)),
-            LogLevel      = MsBuildLogLevel.Quiet
-        };
-        msBuild.Run();
+            msBuild.Exe           = Configuration.MsBuild;
+            msBuild.Configuration = Configuration.BuildConfiguration.ToString().ToUpper();
+            msBuild.Multiple      = true;
+            msBuild.Solution      = Path.Combine(Configuration.SlnDir.FullName, Configuration.SolutionShortFileName);
+            msBuild.Target        = "Clean";
+            msBuild.NoWarn        = string.Join(";", Configuration.NoWarn.OrderBy(a => a));
+            msBuild.LogLevel      = MsBuildLogLevel.Quiet;
+            msBuild.Run();
+        }
+        catch (Exception e)
+        {
+            Log(e, msBuild.LastCommand);
+            throw;
+        }
 
-#if !SKIP_COMPILE
-        // nuger restore
-        ExeRunner.Execute(Cfg.Nuget, "restore", Cfg.SolutionShortFileName);
+        try
+        {
+            // nuget restore
+            ExeRunner.Execute(Configuration.Nuget, "restore", Configuration.SolutionShortFileName);
+        } catch (Exception e)
+        {
+            Log(e, "nuget restore");
+            throw;
+        }
 
-        // build
-        msBuild.Target = "Build";
-        msBuild.Run();
-        ExConsole.WriteLine("Compile time {0}", DateTime.Now - start);
-#endif
+        try
+        {
+            // build
+            msBuild.Target = "Build";
+            msBuild.Run();
+            ExConsole.WriteLine("Compile time {0}", DateTime.Now - start);
+        }
+        catch (Exception e)
+        {
+            Log(e, msBuild.LastCommand);
+            throw;
+        }
+        
+        void Log(Exception e, string command)
+        {
+            ExConsole.WriteLine("Error running command");
+            ExConsole.WriteLine(command);
+            ExConsole.WriteLine(e.Message);
+        }
     }
-
 
     public void A06_DeleteEmbeddedAndMergedBinaries(string[] ilMerged, StringList manuallyEmbeddedPlusForbidden = null)
     {
@@ -87,7 +113,7 @@ public class BuildingScriptBase
     {
         if (string.IsNullOrEmpty(output?.Folder))
             return;
-        if (Cfg.BuildConfiguration != DebugOrRelease.Release) return;
+        if (Configuration.BuildConfiguration != DebugOrRelease.Release) return;
         var synchronizer = new FileSynchronizer
         {
             SourceDir = CompiledBinariesDir,
@@ -100,7 +126,7 @@ public class BuildingScriptBase
 
     protected string A08_UpdateVersions(string[] projs, string mainName, bool updateVersions)
     {
-        var csProjs = projs.Select(a => new FileInfo(Path.Combine(Cfg.SlnDir.FullName, a))).ToArray();
+        var csProjs = projs.Select(a => new FileInfo(Path.Combine(Configuration.SlnDir.FullName, a))).ToArray();
 
         var mains = csProjs.Where(a => string.Equals(a.Name, mainName, StringComparison.OrdinalIgnoreCase)).ToArray();
         if (mains.Length == 0)
@@ -130,26 +156,90 @@ public class BuildingScriptBase
         return version;
     }
 
+
+    public class SavedFile
+    {
+        public SavedFile(string csProj, string copy)
+        {
+            CsProj = csProj;
+            Copy   = copy;
+        }
+
+        public string CsProj { get; }
+        public string Copy   { get; }
+    }
+
+    protected void A09_TurnOffGeneratePackageOnBuild()
+    {
+        var f    = Configuration.SlnDir.GetFiles("*.csproj", SearchOption.AllDirectories);
+        var list = new List<SavedFile>();
+        foreach (var i in f)
+        {
+            var save = false;
+            var xml  = XDocument.Load(i.FullName);
+            if (xml.Root is null)
+                continue;
+            var ns = xml.Root.Name.Namespace;
+            var q  = xml.Root.Elements(ns + "PropertyGroup");
+            foreach (var j in q.Elements(ns + "GeneratePackageOnBuild"))
+            {
+                if (j.Value == "false") continue;
+                j.Value = "false";
+                save    = true;
+            }
+
+            if (!save) continue;
+            var csproj              = i.FullName; // i is the FileInfo object
+            var destinationFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".csproj");
+            File.Copy(csproj, destinationFilePath, true); // true to overwrite existing files
+            list.Add(new SavedFile(csproj, destinationFilePath));
+            xml.Save(csproj);
+        }
+
+        if (list.Count == 0) return;
+        AddRollbackAction(() =>
+        {
+            foreach (var i in list)
+            {
+                File.Copy(i.Copy, i.CsProj, true);
+                File.Delete(i.Copy);
+            }
+        });
+    }
+
+
     protected virtual bool AcceptFile(FileInfo file)
     {
         if (string.Equals(file.Extension, ".pdb", StringComparison.OrdinalIgnoreCase))
             return false;
-        if (string.Equals(file.Name, Cfg.ExeName + ".config", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(file.Name, Configuration.ExeName + ".config", StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
+    }
+
+    public void AddRollbackAction(Action action)
+    {
+        RollbackActions.Add(action);
     }
 
 
     public void KillBeforeCompile()
     {
-        var processes = Cfg.ProcessesToKillBeforeCompile.Distinct().ToArray();
+        var processes = Configuration.ProcessesToKillBeforeCompile.Distinct().ToArray();
         foreach (var i in processes)
             Kill(i);
     }
 
+    public void RollbackModifications()
+    {
+        foreach (var action in RollbackActions)
+            action();
+        RollbackActions.Clear();
+    }
+
     public string SlnDir(params string[] pathItems)
     {
-        var dir = Cfg.SlnDir.FullName;
+        var dir = Configuration.SlnDir.FullName;
         foreach (var item in pathItems)
             dir = Path.Combine(dir, item);
         dir = new DirectoryInfo(dir).FullName;
@@ -158,7 +248,11 @@ public class BuildingScriptBase
 
     public DirectorySynchronizeItem HotOutput { get; set; }
 
-    public Config Cfg { get; }
+    public BuildConfig Configuration { get; }
 
-    protected string CompiledBinariesDir { get; set; }
+    protected string CompiledBinariesDir { get; init; }
+
+    public ReactorProtect? Reactor { get; init; }
+
+    readonly List<Action> RollbackActions = new List<Action>();
 }

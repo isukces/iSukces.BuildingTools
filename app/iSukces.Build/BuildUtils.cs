@@ -78,19 +78,10 @@ public static class BuildUtils
         return parameter;
     }
 
-    private static bool IsBinObj(DirectoryInfo i)
-    {
-        return string.Equals(i.Name, "bin", StringComparison.OrdinalIgnoreCase)
-               || string.Equals(i.Name, "obj", StringComparison.OrdinalIgnoreCase);
-    }
+    private static bool IsBinObj(DirectoryInfo i) => string.Equals(i.Name, "bin", StringComparison.OrdinalIgnoreCase)
+                                                     || string.Equals(i.Name, "obj", StringComparison.OrdinalIgnoreCase);
 
-    public static string Quote(string parameter)
-    {
-        return $"\"{parameter}\"";
-    }
+    public static string Quote(string parameter) => $"\"{parameter}\"";
 
-    private static bool ShouldBeEncoded(string parameter)
-    {
-        return parameter.Contains(" ");
-    }
+    private static bool ShouldBeEncoded(string parameter) => parameter.Contains(" ");
 }

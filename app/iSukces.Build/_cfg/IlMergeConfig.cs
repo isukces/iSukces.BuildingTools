@@ -10,7 +10,7 @@ public struct IlMergeConfig
     public string IlMergeExe { get; set; }
 
     public StringList    Exclude            { get; set; }
-    public string        OutputExe          { get; set; }
+    public string?       OutputExe          { get; set; }
     public string        LogFileName        { get; set; }
     public IlMergeFlags  Flags              { get; set; }
     public string        InternalizeExclude { get; set; }
@@ -31,7 +31,6 @@ public enum IlMergeTarget
 {
     WinExe,
     Exe,
-
     Library
     //target:(library|exe|winexe)
 }
