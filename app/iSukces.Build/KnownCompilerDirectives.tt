@@ -1,23 +1,115 @@
 <#@ template language="C#" #>
 <#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
 <#
     var items = @"
+
+0234 The type or namespace name 'Xaml' does not exist in the namespace
 
 0612 The class designer marked a member with the Obsolete attribute.
 0618 A class member was marked with the Obsolete attribute
 1591 Missing XML comment for publicly visible type or member
+
+8612 Nullability of reference types in type of         
+8618 Non-nullable property 'Objects' must contain a non-null value when exiting constructor.      
+8619 Nullability of reference types in value of type 
+8621 Nullability of reference types in return type of 'lambda expression'
+8622 Nullability of reference types in type of parameter
+
+8632 The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+
+        
+        
+
+8714 The type 'TKey' cannot be used as type parameter 'TKey' in the generic type or method 'Dictionary<TKey, TValue>
+1998 This async method lacks 'await'
+0067 The event 'TrackWiresTools.GetInfoFromVisualElement' is never used
+0809 Obsolete member 'BentPipe.PipeCircumferenceSegments' overrides non-obsolete member 'BentOrStraightPipe.PipeCircumferenceSegments'
+0184 The given expression is never of the provided ('xxx') type        
+8634 The type 'System.IO.DirectoryInfo?' cannot be used as type parameter 'T' in the generic type or method
+3021 'WinNativeMethods.GetWindowStyle(nint)' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
+      
+    
+1522 Empty switch block
+1066 The default value specified for parameter 'startingKind' will have no effect because it applies to a member that is used in contexts that do not allow optional arguments
+8620 Argument of type 'Func<object, Task>' cannot be used for parameter 'execute' of type 'Func<object?, Task>' in 'AsyncCommand.AsyncCommand(Func<object?,
+4014 Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call
+0282 There is no defined ordering between fields in multiple declarations of partial struct 
+ 
+
+8597 Thrown value may be null.
+8600 Converting null literal or possible null value to non-nullable type.
+8601 Possible null reference assignment.
+8602 Dereference of a possibly null reference.
 8603 Possible null reference return.
-86251 Cannot convert null literal to non-nullable reference type
+8604 Possible null reference argument for parameter.
+8605 Unboxing a possibly null value.
+8607 A possible null value may not be used for a type marked with [NotNull] or [DisallowNull]
+8608 Nullability of reference types in type doesn't match overridden member.
+8609 Nullability of reference types in return type doesn't match overridden member.
+8610 Nullability of reference types in type parameter doesn't match overridden member.
+8611 Nullability of reference types in type parameter doesn't match partial method declaration.
+8612 Nullability of reference types in type doesn't match implicitly implemented member.
+8613 Nullability of reference types in return type doesn't match implicitly implemented member.
+8614 Nullability of reference types in type of parameter doesn't match implicitly implemented member.
+8615 Nullability of reference types in type doesn't match implemented member.
+8616 Nullability of reference types in return type doesn't match implemented member.
+8617 Nullability of reference types in type of parameter doesn't match implemented member.
+8618 Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
+8619 Nullability of reference types in value doesn't match target type.
+8620 Argument cannot be used for parameter due to differences in the nullability of reference types.
+8621 Nullability of reference types in return type doesn't match the target delegate (possibly because of nullability attributes).
+8622 Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
+8624 Argument cannot be used as an output due to differences in the nullability of reference types.
+8625 Cannot convert null literal to non-nullable reference type.
+8629 Nullable value type may be null.
+8631 The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match constraint type.
+8633 Nullability in constraints for type parameter of method doesn't match the constraints for type parameter of interface method. Consider using an explicit interface implementation instead.
+8634 The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'class' constraint.
+8643 Nullability of reference types in explicit interface specifier doesn't match interface implemented by the type.
+8644 Type does not implement interface member. Nullability of reference types in interface implemented by the base type doesn't match.
+8645 Member is already listed in the interface list on type with different nullability of reference types.
+8655 The switch expression does not handle some null inputs (it is not exhaustive).
+8667 Partial method declarations have inconsistent nullability in constraints for type parameter.
+8670 Object or collection initializer implicitly dereferences possibly null member.
+8714 The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+8762 Parameter must have a non-null value when exiting.
+8763 A method marked [DoesNotReturn] should not return.
+8764 Nullability of return type doesn't match overridden member (possibly because of nullability attributes).
+8765 Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
+8766 Nullability of reference types in return type of doesn't match implicitly implemented member (possibly because of nullability attributes).
+8767 Nullability of reference types in type of parameter of doesn't match implicitly implemented member (possibly because of nullability attributes).
+8768 Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
+8769 Nullability of reference types in type of parameter doesn't match implemented member (possibly because of nullability attributes).
+8770 Method lacks [DoesNotReturn] annotation to match implemented or overridden member.
+8774 Member must have a non-null value when exiting.
+8776 Member cannot be used in this attribute.
+8775 Member must have a non-null value when exiting.
+8777 Parameter must have a non-null value when exiting.
+8819 Nullability of reference types in return type doesn't match partial method declaration.
+8824 Parameter must have a non-null value when exiting because parameter is non-null.
+8825 Return value must be non-null because parameter is non-null.
+8847 The switch expression does not handle some null inputs (it is not exhaustive). However, a pattern with a 'when' clause might successfully match this value.
+        
+CA1416 This call site is reachable on all platforms
+        
+
+NU1701 Package was restored using old Framework This package may not be fully compatible with your project.
+
+    
 ";
 #>
+using System.Diagnostics.CodeAnalysis;
+namespace iSukces.Build;
 
-namespace iSukces.Build
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+// ReSharper disable once UnusedType.Global
+public static class KnownCompilerDirectives
 {
-    public static class KnownCompilerDirectives
-    {
-        #region Fields
-
 <#
+
+    var tt = new List<Uuu>();
     foreach (var i in items.Split('\r', '\n').Select(a => a.Trim()))
     {
         if (string.IsNullOrWhiteSpace(i))
@@ -26,29 +118,59 @@ namespace iSukces.Build
         var code = i.Substring(0, x);
         var desc = i.Substring(x + 1).Trim();
         var name = Info.GetName(code, desc);
-        WriteLine("        /// <summary>");
-        WriteLine("        /// " + desc);
-        WriteLine("        /// </summary>");
-        WriteLine($"        public const string {name} = \"{code}\";");
 
-        WriteLine("");
+        var bla = new Uuu
+        {
+            Code = code,
+            Desc = desc,
+            Name = name
+        };
+        bla.Update();
+        tt.Add(bla);
+    }
+
+    foreach (var g in tt.GroupBy(a => a.Code).OrderBy(a=>a.Key))
+    {
+        var q = g.OrderBy(a => a.Name.Length).ToArray();
+        //foreach (var i in tt.OrderBy(a => a.Code).ThenBy(a => a.Name.Length))
+        {
+            var i = q[0];
+            var ii = q.Last();
+            WriteLine("    /// <summary>");
+            WriteLine("    /// " + ToXml(ii.Desc));
+            WriteLine("    /// </summary>");
+            WriteLine($"    public const string {i.Name} = \"{i.Code}\";");
+            WriteLine("");
+        }
     }
 #>
- 
-        #endregion
-    }
 }
 
 <#+
+    class Uuu
+    {
+        public string Code { get; set; }
+        public string Desc { get; set; }
+        public string Name { get; set; }
+
+        public void Update()
+        {
+            // if (Code.StartsWith("CS", StringComparison.OrdinalIgnoreCase)) Code = Code.Substring(2);
+        }
+    }
+
     class Info
     {
         private static string Camelize(string desc)
         {
-            var items = desc.Split(' ', '-').Select(a => a.Trim().TrimEnd('.'))
+            var qqq = " -'.,?#<>()[]".ToArray();
+                var items = desc.Split(qqq)
+                .Select(a => a.Trim().TrimEnd('.'))
                 .Where(a => a.Length > 0)
                 .Select(a =>
                 {
                     if (string.Equals(a, "a", StringComparison.OrdinalIgnoreCase)) return "";
+                    if (string.Equals(a, "This", StringComparison.OrdinalIgnoreCase)) return "";
                     if (string.Equals(a, "the", StringComparison.OrdinalIgnoreCase)) return "";
                     if (string.Equals(a, "XML", StringComparison.OrdinalIgnoreCase))
                         return "Xml";
@@ -57,9 +179,18 @@ namespace iSukces.Build
             return string.Join("", items);
         }
 
-        public static object GetName(string code, string desc)
+        public static string GetName(string code, string desc)
         {
-            return "Cs" + code + Camelize(desc);
+            if (code.StartsWith("CS", StringComparison.OrdinalIgnoreCase))
+                code = code.Substring(2);
+            if (!int.TryParse(code, out var _))
+                return code + "_"+Camelize(desc);
+            return "Cs" + code + "_"+Camelize(desc);
         }
+    }
+
+    private static string ToXml(string desc)
+    {
+        return desc.Replace("<", "&lt;").Replace(">", "&gt;");
     }
 #>
