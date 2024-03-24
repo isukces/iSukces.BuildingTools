@@ -65,14 +65,14 @@ public sealed class CompilerDirectiveUpdater
             || string.Equals(dir.Name, "obj", StringComparison.CurrentCultureIgnoreCase))
             return;
         foreach (var fi in dir.GetFiles("*.csproj"))
-            Update(fi, true);
+            UpdateOneFile(fi, true);
         if (level == 0)
             foreach (var fi in dir.GetFiles("Directory.Build.props"))
-                Update(fi, false);
+                UpdateOneFile(fi, false);
         foreach (var i in dir.GetDirectories()) Modify(i, level + 1);
     }
 
-    private void Update(FileInfo fi, bool isCsProj)
+    private void UpdateOneFile(FileInfo fi, bool isCsProj)
     {
         var xml  = XDocument.Load(fi.FullName);
         var root = xml.Root;
@@ -96,8 +96,31 @@ public sealed class CompilerDirectiveUpdater
 
         foreach (var i in root.Elements(root.Name.Namespace + "PropertyGroup"))
         {
-            if (_cl.Directives.Any() && !skip)
-                foreach (var j in i.Elements(root.Name.Namespace + "DefineConstants"))
+            OnePropertyGroup(i);
+            var n = fi.GetShortFileNameWithoutExtension() + ".xml";
+            if (FixDocumentation(i, n))
+                save = true;
+        }
+
+
+        if (save)
+            xml.Save(fi.FullName);
+        return;
+
+        void OnePropertyGroup(XElement propGroup)
+        {
+         
+            if (_cl.Directives.Count == 0 || skip) return;
+            var nameDefineConstants = root.Name.Namespace + "DefineConstants";
+            var defineConstantsNode = propGroup.Elements(nameDefineConstants).ToArray();
+            if (!isCsProj)
+            {
+                //Console.WriteLine(fi.FullName+" "+defineConstantsNode.Length);
+            }
+
+            if (isCsProj)
+            {
+                foreach (var j in defineConstantsNode)
                 {
                     var x    = j.Value;
                     var list = x.Split(';', ' ').Where(a => a != "").ToHashSet();
@@ -109,14 +132,38 @@ public sealed class CompilerDirectiveUpdater
                     j.Value = y;
                     save    = true;
                 }
+            }
+            else
+            {
+                var          compare = propGroup.ToString();
+                HashSet<string> hashSet     = new();
+                foreach (var j in defineConstantsNode)
+                {
+                    var x = j.Value;
+                    // Console.WriteLine($"z1 = '{x}'");
+                    foreach (var i in x.Split(';', ' '))
+                        hashSet.Add(i.Trim());
+                    j.Remove();
+                }
 
-            var n = fi.GetShortFileNameWithoutExtension() + ".xml";
-            if (FixDocumentation(i, n))
-                save = true;
+                const string special = "$(DefineConstants)";
+                UpdateDefineConstants(hashSet, hasAmmy, isCsProj);
+                hashSet.Remove(special);
+                hashSet.Remove("");
+                // Console.WriteLine("z2 = " + string.Join(";", hashSet));
+                foreach (var directive in hashSet.OrderBy(a => a, new CompilerDirectiveComparer()))
+                {
+                    var value    = special + ";" + directive;
+                    var xElement = new XElement(nameDefineConstants, value);
+                    propGroup.Add(xElement);
+                }
+
+                var compare2 = propGroup.ToString();
+                if (compare2 != compare)
+                    save = true;
+            }
+
         }
-
-        if (save)
-            xml.Save(fi.FullName);
     }
 
     private void UpdateDefineConstants(HashSet<string> list, bool hasAmmy, bool isCsProj)
@@ -128,7 +175,6 @@ public sealed class CompilerDirectiveUpdater
         if (!hasAmmy)
             list.Set(noAmmyUpdate, false);
         list.Add("$(DefineConstants)");
-        //list = list.Where(a => !a.Contains(noAmmyUpdate)).ToHashSet();
     }
 
     #region Fields

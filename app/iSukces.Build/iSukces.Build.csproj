@@ -17,9 +17,9 @@
         <PackageProjectUrl>https://github.com/isukces/iSukces.BuildingTools</PackageProjectUrl>
         <RepositoryUrl>https://github.com/isukces/iSukces.BuildingTools</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <AssemblyVersion>1.24.318.4</AssemblyVersion>
-        <Version>1.24.318.4</Version>
-        <FileVersion>1.24.318.4</FileVersion>
+        <AssemblyVersion>1.24.324.5</AssemblyVersion>
+        <Version>1.24.324.5</Version>
+        <FileVersion>1.24.324.5</FileVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <IncludeSource>false</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>

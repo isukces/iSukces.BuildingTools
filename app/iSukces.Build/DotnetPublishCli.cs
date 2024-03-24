@@ -24,31 +24,12 @@ public class DotnetPublishCli
 
         return true;
 
-        bool Equals(string name)
-        {
-            return string.Equals(file.Name, name, StringComparison.OrdinalIgnoreCase);
-        }
+        bool Equals(string name) => string.Equals(file.Name, name, StringComparison.OrdinalIgnoreCase);
     }
 
     public List<string> GetCommandLineparameters()
     {
         var r = new List<string>();
-
-        void Add(string name, string value)
-        {
-            if (string.IsNullOrEmpty(value)) return;
-            r.Add(name);
-            if (value.Contains(" "))
-                value = value.Quote();
-            r.Add(value);
-        }
-
-        void Add2(bool flag, string value)
-        {
-            if (flag)
-                r.Add(value);
-        }
-
         r.Add("publish");
         r.Add(SlnFile);
         Add("--configuration", Configuration.ToString().ToLower());
@@ -66,8 +47,30 @@ public class DotnetPublishCli
             r.Add("--no-self-contained");
 
         Add("--output", OutputDir);
+        Add("--nowarn", NoWarn.AsDotnetBuild, true);
 
+        r.AddRange(NonstandardCommandLineparameters);
         return r;
+
+        void Add2(bool flag, string value)
+        {
+            if (flag)
+                r.Add(value);
+        }
+
+        void Add(string name, string value, bool doubleDot = false)
+        {
+            if (string.IsNullOrEmpty(value)) return;
+            if (value.Contains(" "))
+                value = value.Quote();
+            if (doubleDot)
+                r.Add(name + ":" + value);
+            else
+            {
+                r.Add(name);
+                r.Add(value);
+            }
+        }
     }
 
     public void Run()
@@ -104,6 +107,10 @@ public class DotnetPublishCli
                 f2.Delete();
     }
 
+    #region Properties
+
+    public List<string> NonstandardCommandLineparameters { get; } = new();
+
     public string SlnFile { get; set; }
 
     public bool Nodependencies { get; set; }
@@ -112,18 +119,15 @@ public class DotnetPublishCli
 
     public string Runtime { get; set; }
 
-
     /// <summary>
     ///     The directory in which to place the published artifacts.
     /// </summary>
     public string OutputDir { get; set; }
 
-
     /// <summary>
     ///     The target framework to publish for.
     /// </summary>
     public string Framework { get; set; }
-
 
     /// <summary>
     ///     Publishes the application as a self-contained application.
@@ -132,12 +136,15 @@ public class DotnetPublishCli
 
     public bool Force { get; set; }
 
-
     public bool NoBuild   { get; set; }
     public bool NoRestore { get; set; }
     public bool NoLogo    { get; set; }
 
     public Func<FileInfo, bool> AcceptFileAfterBuild { get; set; }
+
+    public CompilerWarningsContainer NoWarn { get; set; } = new();
+
+    #endregion
 
     /*
     public string VersionSuffix                  { get; set; }

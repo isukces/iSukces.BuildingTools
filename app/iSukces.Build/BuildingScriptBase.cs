@@ -45,7 +45,7 @@ public class BuildingScriptBase : IRollbackContainer
             msBuild.Multiple      = true;
             msBuild.Solution      = Path.Combine(Configuration.SlnDir.FullName, Configuration.SolutionShortFileName);
             msBuild.Target        = "Clean";
-            msBuild.NoWarn        = string.Join(";", Configuration.NoWarn.OrderBy(a => a));
+            msBuild.NoWarn        = Configuration.NoWarn.ToString();
             msBuild.LogLevel      = MsBuildLogLevel.Quiet;
             msBuild.Run();
         }

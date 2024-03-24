@@ -17,18 +17,12 @@ public static class BuildExtensions
     }
 
 
-    public static void Set(this HashSet<string> list, string compilerConstant, bool add)
+    public static void Set(this HashSet<string> set, string compilerConstant, bool add)
     {
         if (add)
-        {
-            list.Add(compilerConstant);
-            // list.Remove("_" + compilerConstant);
-        }
+            set.Add(compilerConstant);
         else
-        {
-            //list.Add("_" + compilerConstant);
-            list.Remove(compilerConstant);
-        }
+            set.Remove(compilerConstant);
     }
 
     public static string ToInv(this int x)

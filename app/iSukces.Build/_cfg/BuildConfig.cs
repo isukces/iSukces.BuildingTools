@@ -50,9 +50,9 @@ public class BuildConfig
     /// </summary>
     public string? CompiledBinary { get; set; } = "bin\\{0}";
 
-    public string          ExeName { get; set; }
-    public HashSet<string> NoWarn  { get; }      = new();
-    public string          Nuget   { get; set; } = "nuget.exe";
+    public string                    ExeName { get; set; }
+    public CompilerWarningsContainer NoWarn  { get; set; } = new();
+    public string                    Nuget   { get; set; } = "nuget.exe";
 
     public IlMergeConfig? IlMerge { get; set; }
 
