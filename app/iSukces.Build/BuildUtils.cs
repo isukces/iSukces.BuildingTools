@@ -62,7 +62,8 @@ public static class BuildUtils
         if (!delete) return;
         foreach (var i in dir.GetFiles())
         {
-            Console.WriteLine("Delete " + dir.FullName);
+            if (DisplayDeletedFiles)
+                Console.WriteLine("Delete " + i.FullName);
             i.Delete();
         }
 
@@ -78,10 +79,20 @@ public static class BuildUtils
         return parameter;
     }
 
-    private static bool IsBinObj(DirectoryInfo i) => string.Equals(i.Name, "bin", StringComparison.OrdinalIgnoreCase)
-                                                     || string.Equals(i.Name, "obj", StringComparison.OrdinalIgnoreCase);
+    private static bool IsBinObj(DirectoryInfo directory)
+    {
+        return directory.Name.ToLower() is "bin" or "obj";
+    }
 
-    public static string Quote(string parameter) => $"\"{parameter}\"";
+    public static string Quote(string parameter)
+    {
+        return $"\"{parameter}\"";
+    }
 
-    private static bool ShouldBeEncoded(string parameter) => parameter.Contains(" ");
+    private static bool ShouldBeEncoded(string parameter)
+    {
+        return parameter.Contains(' ', StringComparison.Ordinal);
+    }
+
+    public static bool DisplayDeletedFiles { get; set; } = true;
 }
