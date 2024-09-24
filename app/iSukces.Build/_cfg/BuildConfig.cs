@@ -6,7 +6,7 @@ namespace iSukces.Build;
 
 public class BuildConfig
 {
-    public string GetCompiledBinary()
+    public string? GetCompiledBinary()
     {
         var tmp = CompiledBinary?.Replace("{0}", BuildConfiguration.ToString());
         return tmp;
@@ -65,8 +65,18 @@ public class BuildConfig
 
     public string InstallationFolder { get; set; }
 
-    // public bool UseIlMerge     { get; set; }
     public bool UpdateVersions { get; set; }
 
+    public PublishSettings PublishSettings { get; } = new();
+
     #endregion
+}
+
+public class PublishSettings
+{
+    public string Runtime   { get; set; } = "win-x64";
+    public string Framework { get; set; } = "net8.0-windows";
+
+    public bool SelfContained { get; set; } = false;
+    public bool Force         { get; set; } = true;
 }

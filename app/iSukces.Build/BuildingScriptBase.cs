@@ -33,8 +33,24 @@ public class BuildingScriptBase : IRollbackContainer
         }
     }
 
+    protected void A03_DotnetPublish(Action<DotnetPublishCli>? configure)
+    {
+        var cli = new DotnetPublishCli
+        {
+            SlnFile       = Path.Combine(Configuration.SlnDir.FullName, Configuration.SolutionShortFileName),
+            Configuration = Configuration.BuildConfiguration,
+            Runtime       = Configuration.PublishSettings.Runtime,
+            Framework     = Configuration.PublishSettings.Framework,
+            SelfContained = Configuration.PublishSettings.SelfContained,
+            Force         = Configuration.PublishSettings.Force,
+            OutputDir     = Configuration.PublishOutputDir,
+            NoWarn        = Configuration.NoWarn
+        };
+        configure?.Invoke(cli);
+        cli.Run();
+    }
 
-    protected void A03_Compile()
+    protected void A03_CompileMsBuildAndNuget()
     {
         var start   = DateTime.Now;
         var msBuild = new MsBuild();
