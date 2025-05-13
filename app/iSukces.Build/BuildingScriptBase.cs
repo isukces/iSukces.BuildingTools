@@ -33,23 +33,6 @@ public class BuildingScriptBase : IRollbackContainer
         }
     }
 
-    protected void A03_DotnetPublish(Action<DotnetPublishCli>? configure)
-    {
-        var cli = new DotnetPublishCli
-        {
-            SlnFile       = Path.Combine(Configuration.SlnDir.FullName, Configuration.SolutionShortFileName),
-            Configuration = Configuration.BuildConfiguration,
-            Runtime       = Configuration.PublishSettings.Runtime,
-            Framework     = Configuration.PublishSettings.Framework,
-            SelfContained = Configuration.PublishSettings.SelfContained,
-            Force         = Configuration.PublishSettings.Force,
-            OutputDir     = Configuration.PublishOutputDir,
-            NoWarn        = Configuration.NoWarn
-        };
-        configure?.Invoke(cli);
-        cli.Run();
-    }
-
     protected void A03_CompileMsBuildAndNuget()
     {
         var start   = DateTime.Now;
@@ -75,7 +58,8 @@ public class BuildingScriptBase : IRollbackContainer
         {
             // nuget restore
             ExeRunner.Execute(Configuration.Nuget, "restore", Configuration.SolutionShortFileName);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             Log(e, "nuget restore");
             throw;
@@ -93,13 +77,30 @@ public class BuildingScriptBase : IRollbackContainer
             Log(e, msBuild.LastCommand);
             throw;
         }
-        
+
         void Log(Exception e, string command)
         {
             ExConsole.WriteLine("Error running command");
             ExConsole.WriteLine(command);
             ExConsole.WriteLine(e.Message);
         }
+    }
+
+    protected void A03_DotnetPublish(Action<DotnetPublishCli>? configure)
+    {
+        var cli = new DotnetPublishCli
+        {
+            SlnFile       = Path.Combine(Configuration.SlnDir.FullName, Configuration.SolutionShortFileName),
+            Configuration = Configuration.BuildConfiguration,
+            Runtime       = Configuration.PublishSettings.Runtime,
+            Framework     = Configuration.PublishSettings.Framework,
+            SelfContained = Configuration.PublishSettings.SelfContained,
+            Force         = Configuration.PublishSettings.Force,
+            OutputDir     = Configuration.PublishOutputDir,
+            NoWarn        = Configuration.NoWarn
+        };
+        configure?.Invoke(cli);
+        cli.Run();
     }
 
     public void A06_DeleteEmbeddedAndMergedBinaries(string[] ilMerged, StringList manuallyEmbeddedPlusForbidden = null)
@@ -170,19 +171,6 @@ public class BuildingScriptBase : IRollbackContainer
         }
 
         return version;
-    }
-
-
-    public class SavedFile
-    {
-        public SavedFile(string csProj, string copy)
-        {
-            CsProj = csProj;
-            Copy   = copy;
-        }
-
-        public string CsProj { get; }
-        public string Copy   { get; }
     }
 
     protected void A09_TurnOffGeneratePackageOnBuild()
@@ -262,6 +250,8 @@ public class BuildingScriptBase : IRollbackContainer
         return dir;
     }
 
+    protected FilesBackup Backup { get; } = new FilesBackup();
+
     public DirectorySynchronizeItem HotOutput { get; set; }
 
     public BuildConfig Configuration { get; }
@@ -270,5 +260,18 @@ public class BuildingScriptBase : IRollbackContainer
 
     public ReactorProtect? Reactor { get; init; }
 
-    readonly List<Action> RollbackActions = new List<Action>();
+    private readonly List<Action> RollbackActions = new List<Action>();
+
+
+    public class SavedFile
+    {
+        public SavedFile(string csProj, string copy)
+        {
+            CsProj = csProj;
+            Copy   = copy;
+        }
+
+        public string CsProj { get; }
+        public string Copy   { get; }
+    }
 }

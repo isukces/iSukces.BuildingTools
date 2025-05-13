@@ -76,6 +76,10 @@ public class DotnetPublishCli
     public void Run()
     {
         var clone = (DotnetPublishCli)MemberwiseClone();
+        if (string.IsNullOrEmpty(clone.OutputDir))
+            throw new Exception("OutputDir is not set");
+        if (string.IsNullOrEmpty(clone.SlnFile))
+            throw new Exception("SlnFile is not set");
 
         var tmp = ExeRunner.WorkingDir;
         if (!string.IsNullOrEmpty(tmp))
