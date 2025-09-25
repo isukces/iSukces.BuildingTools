@@ -11,7 +11,10 @@ public class InnoSetupFile
     public static InnoSetupFile Load(string fn, Encoding? encoding = null)
     {
         var b = File.ReadAllBytes(fn);
-        var s = encoding?.GetString(b) ?? Encoding.UTF8.GetString(b);
+        encoding ??= Encoding.UTF8;
+        if (Equals(encoding, Encoding.UTF8)) b = RemoveBomIfExists(b);
+        var s                                  = encoding.GetString(b);
+
         s = s.Replace("\r\n", "\n");
         var lines = s.Split('\n');
         return Parse(lines);
@@ -20,7 +23,7 @@ public class InnoSetupFile
     private static InnoSetupFile Parse(string[] lines)
     {
         var     a       = new InnoSetupFile();
-        Section current = null;
+        Section? current = null;
         foreach (var i in lines)
         {
             var m = SectionRegex.Match(i);
@@ -41,6 +44,14 @@ public class InnoSetupFile
         }
 
         return a;
+    }
+
+    private static byte[] RemoveBomIfExists(byte[] b)
+    {
+        if (b.Length < 3) return b;
+        if (b[0] == 239 && b[1] == 187 && b[2] == 191)
+            b = b.Skip(3).ToArray();
+        return b;
     }
 
     public Section GetOrCreateSection(string name)
@@ -146,7 +157,7 @@ public class InnoSetupFile
         public string        Name     { get; set; }
         public List<Command> Commands { get; } = new();
 
-        public string this[string name]
+        public string? this[string name]
         {
             get
             {
