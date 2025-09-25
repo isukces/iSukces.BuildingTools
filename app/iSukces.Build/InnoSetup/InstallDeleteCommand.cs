@@ -19,6 +19,12 @@ public sealed partial class InstallDeleteCommand : Command
     {
         var sb = new StringBuilder();
 
+        AddCommand("Type", Type);
+        AddCommand("Name", Name, true);
+        var code = sb.ToString();
+        code = code.TrimEnd(';', ' ');
+        return code;
+
         void AddCommand(string name, string value, bool quote = false)
         {
             if (string.IsNullOrEmpty(value))
@@ -30,12 +36,6 @@ public sealed partial class InstallDeleteCommand : Command
             sb.Append(value);
             sb.Append("; ");
         }
-
-        AddCommand("Type", Type);
-        AddCommand("Name", Name, true);
-        var code = sb.ToString();
-        code = code.TrimEnd(';', ' ');
-        return code;
     }
 
     public string Type { get; set; }
@@ -48,6 +48,7 @@ public sealed partial class InstallDeleteCommand : Command
         ReplaceSameversion = 1,
         IgnoreVersion = 2,
         DontCopy = 4,
-        NoEncryption = 8
+        NoEncryption = 8,
+        OnlyIfDoesntExist = 16
     }
 }

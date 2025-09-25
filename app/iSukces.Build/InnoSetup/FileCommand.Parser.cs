@@ -18,10 +18,11 @@ public sealed partial class FileCommand
         {
             var a = new Dictionary<string, FileFlags>(StringComparer.OrdinalIgnoreCase)
             {
-                [FileFlags.IgnoreVersion.ToString()]      = FileFlags.IgnoreVersion,
-                [FileFlags.ReplaceSameversion.ToString()] = FileFlags.ReplaceSameversion,
-                [FileFlags.DontCopy.ToString()]           = FileFlags.DontCopy,
-                [FileFlags.NoEncryption.ToString()]       = FileFlags.NoEncryption
+                [nameof(FileFlags.IgnoreVersion)]      = FileFlags.IgnoreVersion,
+                [nameof(FileFlags.ReplaceSameversion)] = FileFlags.ReplaceSameversion,
+                [nameof(FileFlags.DontCopy)]           = FileFlags.DontCopy,
+                [nameof(FileFlags.NoEncryption)]       = FileFlags.NoEncryption,
+                [nameof(FileFlags.OnlyIfdoesntExist)]  = FileFlags.OnlyIfdoesntExist
             };
 
             var r = FileFlags.None;
@@ -35,7 +36,7 @@ public sealed partial class FileCommand
             return r;
         }
 
-        private static FileCommand PatseTokens(List<string> tokens)
+        private static FileCommand? PatseTokens(List<string> tokens)
         {
             if (tokens.Count == 0)
                 return null;
@@ -43,27 +44,6 @@ public sealed partial class FileCommand
             var          state  = TokenParsingState.Begin;
             var          result = new FileCommand();
             List<string> args   = new();
-
-            void FlushCommand()
-            {
-                switch (name)
-                {
-                    case "Source":
-                        result.Source = args.Single();
-                        break;
-                    case "DestDir":
-                        result.DestDir = args.Single();
-                        break;
-                    case "Flags":
-                        result.Flags = ParseFileFlags(args);
-                        break;
-                    default:
-                        throw new NotImplementedException(name);
-                }
-
-                args.Clear();
-                state = TokenParsingState.Begin;
-            }
 
             foreach (var item in tokens)
             {
@@ -128,6 +108,27 @@ public sealed partial class FileCommand
             }
 
             return result;
+
+            void FlushCommand()
+            {
+                switch (name)
+                {
+                    case "Source":
+                        result.Source = args.Single();
+                        break;
+                    case "DestDir":
+                        result.DestDir = args.Single();
+                        break;
+                    case "Flags":
+                        result.Flags = ParseFileFlags(args);
+                        break;
+                    default:
+                        throw new NotImplementedException(name);
+                }
+
+                args.Clear();
+                state = TokenParsingState.Begin;
+            }
         }
 
         private enum TokenParsingState

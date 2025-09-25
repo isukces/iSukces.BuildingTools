@@ -18,10 +18,11 @@ public sealed partial class InstallDeleteCommand
         {
             var a = new Dictionary<string, FileFlags>(StringComparer.OrdinalIgnoreCase)
             {
-                [FileFlags.IgnoreVersion.ToString()]      = FileFlags.IgnoreVersion,
-                [FileFlags.ReplaceSameversion.ToString()] = FileFlags.ReplaceSameversion,
-                [FileFlags.DontCopy.ToString()]           = FileFlags.DontCopy,
-                [FileFlags.NoEncryption.ToString()]       = FileFlags.NoEncryption
+                [nameof(FileFlags.IgnoreVersion)]      = FileFlags.IgnoreVersion,
+                [nameof(FileFlags.ReplaceSameversion)] = FileFlags.ReplaceSameversion,
+                [nameof(FileFlags.DontCopy)]           = FileFlags.DontCopy,
+                [nameof(FileFlags.NoEncryption)]       = FileFlags.NoEncryption,
+                [nameof(FileFlags.OnlyIfDoesntExist)]  = FileFlags.OnlyIfDoesntExist
             };
 
             var r = FileFlags.None;

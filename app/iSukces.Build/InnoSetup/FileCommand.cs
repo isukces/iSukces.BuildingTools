@@ -15,18 +15,6 @@ public sealed partial class FileCommand : Command
     {
         var sb = new StringBuilder();
 
-        void AddCommand(string name, string value, bool quote = false)
-        {
-            if (string.IsNullOrEmpty(value))
-                return;
-            sb.Append(name);
-            sb.Append(": ");
-            if (quote)
-                value = $"\"{value}\"";
-            sb.Append(value);
-            sb.Append("; ");
-        }
-
         AddCommand("Source", Source, true);
         if ((Flags & FileFlags.DontCopy) == 0)
             AddCommand("DestDir", DestDir, true);
@@ -38,7 +26,8 @@ public sealed partial class FileCommand : Command
                 FileFlags.IgnoreVersion,
                 FileFlags.ReplaceSameversion,
                 FileFlags.DontCopy,
-                FileFlags.NoEncryption
+                FileFlags.NoEncryption,
+                FileFlags.OnlyIfdoesntExist
             };
             foreach (var i in flagsArray)
             {
@@ -51,6 +40,18 @@ public sealed partial class FileCommand : Command
         var code = sb.ToString();
         code = code.TrimEnd(';', ' ');
         return code;
+
+        void AddCommand(string name, string value, bool quote = false)
+        {
+            if (string.IsNullOrEmpty(value))
+                return;
+            sb.Append(name);
+            sb.Append(": ");
+            if (quote)
+                value = $"\"{value}\"";
+            sb.Append(value);
+            sb.Append("; ");
+        }
     }
 
     public string Source { get; set; }
@@ -66,6 +67,7 @@ public sealed partial class FileCommand : Command
         ReplaceSameversion = 1,
         IgnoreVersion = 2,
         DontCopy = 4,
-        NoEncryption = 8
+        NoEncryption = 8,
+        OnlyIfdoesntExist = 16
     }
 }
