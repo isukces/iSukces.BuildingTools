@@ -85,6 +85,9 @@ public sealed class InnoSetupFileBuilder
         var a = new DirectoryInfo(publishOutputDir);
         var b = new DirectoryInfo(installationFolder);
 
+        Compare(a, b);
+        return;
+
         void Compare(DirectoryInfo pub, DirectoryInfo inst)
         {
             if (!inst.Exists)
@@ -113,8 +116,6 @@ public sealed class InnoSetupFileBuilder
                 }
             }
         }
-
-        Compare(a, b);
     }
 
     public void DeleteAllFiles()

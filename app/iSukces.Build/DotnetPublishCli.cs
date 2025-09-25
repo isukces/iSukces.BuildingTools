@@ -24,16 +24,20 @@ public class DotnetPublishCli
 
         return true;
 
-        bool Equals(string name) => string.Equals(file.Name, name, StringComparison.OrdinalIgnoreCase);
+        bool Equals(string name)
+        {
+            return string.Equals(file.Name, name, StringComparison.OrdinalIgnoreCase);
+        }
     }
 
     public List<string> GetCommandLineparameters()
     {
         var r = new List<string>();
-        r.Add("publish");
+        r.Add(Verb.ToString().ToLower());
         r.Add(SlnFile);
         Add("--configuration", Configuration.ToString().ToLower());
-        Add("--runtime", Runtime);
+        if (Verb == DotnetVerbs.Publish)
+            Add("--runtime", Runtime);
         Add("--framework", Framework);
 
         Add2(Force, "--force");
@@ -113,6 +117,8 @@ public class DotnetPublishCli
 
     #region Properties
 
+    public DotnetVerbs Verb { get; set; } = DotnetVerbs.Publish;
+
     public List<string> NonstandardCommandLineparameters { get; } = new();
 
     public string SlnFile { get; set; }
@@ -189,3 +195,9 @@ public class DotnetPublishCli
 
 dotnet publish -h|--help
  */
+
+public enum DotnetVerbs
+{
+    Publish,
+    Build,
+}

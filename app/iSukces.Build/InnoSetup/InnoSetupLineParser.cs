@@ -12,19 +12,6 @@ public static class InnoSetupLineParser
         var          tokenType = TokenParsingState.Begin;
         var          sb        = new StringBuilder();
 
-        void Flush()
-        {
-            if (sb.Length > 0)
-            {
-                var trim = sb.ToString().Trim();
-                if (trim.Length > 0)
-                    tokens.Add(trim);
-                sb.Clear();
-            }
-
-            tokenType = TokenParsingState.Begin;
-        }
-
         foreach (var i in s)
         {
             if (tokenType == TokenParsingState.Begin)
@@ -87,6 +74,19 @@ public static class InnoSetupLineParser
         }
 
         return tokens;
+
+        void Flush()
+        {
+            if (sb.Length > 0)
+            {
+                var trim = sb.ToString().Trim();
+                if (trim.Length > 0)
+                    tokens.Add(trim);
+                sb.Clear();
+            }
+
+            tokenType = TokenParsingState.Begin;
+        }
     }
 
     private enum TokenParsingState
