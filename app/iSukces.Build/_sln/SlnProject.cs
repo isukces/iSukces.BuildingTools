@@ -15,8 +15,8 @@ public class SlnProject
         };
         args.AddRange(OtherArguments);
 
-        var def = string.Join(", ", args.Select(a => a.Quote()));
-        var id  = Kind.ToString().Quote();
+        var def = string.Join(", ", args.Select(a => a.CliQuote()));
+        var id  = Kind.ToString().CliQuote();
         return $"Project({id}) = {def}";
     }
 

@@ -8,14 +8,10 @@ public class CommandLineParameters
     {
         if (string.IsNullOrWhiteSpace(s))
             return;
-        _list.Add(BuildUtils.Encode(s));
+        _list.Add(s.CliQuoteIfNecessary());
     }
 
     public string[] ToArray() => _list.ToArray();
 
-    #region Fields
-
     private readonly List<string> _list = new();
-
-    #endregion
 }

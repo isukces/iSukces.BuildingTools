@@ -39,6 +39,11 @@ public static class FileExtensions
 
     public static DirectoryInfo ScanSolutionDir(this Assembly assembly, string solutionName)
     {
+        var a = SearchFoldersUntilFileExists(new FileInfo(assembly.Location).Directory);
+        if (a is null)
+            throw new FileNotFoundException($"File {solutionName} not found.");
+        return a;
+
         DirectoryInfo? SearchFoldersUntilFileExists(DirectoryInfo? di)
         {
             while (di is not null)
@@ -53,10 +58,5 @@ public static class FileExtensions
 
             return null;
         }
-
-        var a = SearchFoldersUntilFileExists(new FileInfo(assembly.Location).Directory);
-        if (a is null)
-            throw new FileNotFoundException($"File {solutionName} not found.");
-        return a;
     }
 }

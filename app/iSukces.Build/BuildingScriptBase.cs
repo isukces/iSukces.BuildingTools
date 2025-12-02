@@ -57,11 +57,12 @@ public class BuildingScriptBase : IRollbackContainer
         try
         {
             // nuget restore
-            ExeRunner.Execute(Configuration.Nuget, "restore", Configuration.SolutionShortFileName);
+            // ExeRunner.Execute(Configuration.Nuget, "restore", Configuration.SolutionShortFileName);
+            ExeRunner.Execute("dotnet", "restore", Configuration.SolutionShortFileName);
         }
         catch (Exception e)
         {
-            Log(e, "nuget restore");
+            Log(e, "dotnet restore");
             throw;
         }
 

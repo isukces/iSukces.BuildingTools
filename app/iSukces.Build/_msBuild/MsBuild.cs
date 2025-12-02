@@ -2,7 +2,7 @@
 
 namespace iSukces.Build;
 
-public class MsBuild
+public class MsBuild:MsBuildConfig
 {
     public void Run()
     {
@@ -23,7 +23,7 @@ public class MsBuild
         // AddP("DefineConstants", "HOT,TRACE;DEVELOPER;JETBRAINS_ANNOTATIONS;NETFRAMEWORK;NO_LIVE_LANGUAGE_CHANGE;PIPELINEDESIGNER", true);
 
         var pList = par.ToArray();
-        LastCommand          = Exe + " " + string.Join(" ", pList);
+        LastCommand          = Exe.CliQuoteIfNecessary() + " " + string.Join(" ", pList);
         ExeRunner.WorkingDir = solution.Directory.FullName;
         ExeRunner.Execute(Exe, pList);
         return;
@@ -39,27 +39,10 @@ public class MsBuild
             par.Add(value);
         }
     }
+    public string? LastCommand { get; private set; }
+    
+    public string? Exe      { get; set; }
+    public string  Target   { get; set; } = "Build";
+    public string? Solution { get; set; }
 
-    #region Properties
-
-    public string LastCommand { get; private set; }
-
-    public string Exe { get; set; }
-
-    public string Target { get; set; } = "Build";
-
-    public string Configuration { get; set; } = "RELEASE";
-    public string NoWarn        { get; set; } = "";
-
-    public string Solution { get; set; }
-
-    public bool             Multiple { get; set; }
-    public MsBuildLogLevel? LogLevel { get; set; }
-
-    #endregion
-}
-
-public enum MsBuildLogLevel
-{
-    Quiet, Minimal, Normal, Detailed, Diagnostic
 }

@@ -72,11 +72,15 @@ public static class BuildUtils
         Console.WriteLine("Delete " + dir.FullName);
     }
 
+    [Obsolete("Use CliQuoteIfNecessary extension method instead", true)]
     public static string Encode(string parameter)
     {
+        return parameter.CliQuoteIfNecessary();
+        /*
         if (ShouldBeEncoded(parameter))
             return Quote(parameter);
         return parameter;
+    */
     }
 
     private static bool IsBinObj(DirectoryInfo directory)
@@ -89,10 +93,10 @@ public static class BuildUtils
         return $"\"{parameter}\"";
     }
 
-    private static bool ShouldBeEncoded(string parameter)
+    /*private static bool ShouldBeEncoded(string parameter)
     {
         return parameter.Contains(' ', StringComparison.Ordinal);
-    }
+    }*/
 
     public static bool DisplayDeletedFiles { get; set; } = true;
 }

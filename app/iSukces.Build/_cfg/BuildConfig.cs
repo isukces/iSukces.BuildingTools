@@ -52,6 +52,9 @@ public class BuildConfig
 
     public string                    ExeName { get; set; }
     public CompilerWarningsContainer NoWarn  { get; set; } = new();
+    
+    
+    [Obsolete("No longer used. Dotnet restere is used instead", true)]
     public string                    Nuget   { get; set; } = "nuget.exe";
 
     public IlMergeConfig? IlMerge { get; set; }

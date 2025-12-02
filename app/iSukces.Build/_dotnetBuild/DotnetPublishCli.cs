@@ -32,49 +32,39 @@ public class DotnetPublishCli
 
     public List<string> GetCommandLineparameters()
     {
-        var r = new List<string>();
+        var r = new XBuilder();
         r.Add(Verb.ToString().ToLower());
         r.Add(SlnFile);
-        Add("--configuration", Configuration.ToString().ToLower());
+        r.Add("--configuration", Configuration.ToString().ToLower());
         if (Verb == DotnetVerbs.Publish)
-            Add("--runtime", Runtime);
-        Add("--framework", Framework);
+            r.Add("--runtime", Runtime);
+        r.Add("--framework", Framework);
 
-        Add2(Force, "--force");
-        Add2(NoLogo, "--nologo");
-        Add2(NoRestore, "--no-restore");
-        Add2(NoBuild, "--no-build");
-        Add2(Nodependencies, "--no-dependencies");
+        r.Add2(Force, "--force");
+        r.Add2(NoLogo, "--nologo");
+        r.Add2(NoRestore, "--no-restore");
+        r.Add2(NoBuild, "--no-build");
+        r.Add2(Nodependencies, "--no-dependencies");
         if (SelfContained)
-            Add("--self-contained", SelfContained.ToString().ToLower());
+            r.Add("--self-contained", SelfContained.ToString().ToLower());
         else
             r.Add("--no-self-contained");
 
-        Add("--output", OutputDir);
-        Add("--nowarn", NoWarn.AsDotnetBuild, true);
+        r.Add("--output", OutputDir);
+        r.Add("--nowarn", NoWarn.AsDotnetBuild, true);
+        {
+            if (MsBuild is not null)
+            {
+                r.AddNotNull("/nr:", MsBuild.NodeReuse);
+                r.AddNotNull("/p:UseSharedCompilation=", MsBuild.UseSharedCompilation);
+                r.AddNotNull("/m:", MsBuild.MaxCpuCount);
+            }
+        }
 
         r.AddRange(NonstandardCommandLineparameters);
         return r;
 
-        void Add2(bool flag, string value)
-        {
-            if (flag)
-                r.Add(value);
-        }
-
-        void Add(string name, string value, bool doubleDot = false)
-        {
-            if (string.IsNullOrEmpty(value)) return;
-            if (value.Contains(" "))
-                value = value.Quote();
-            if (doubleDot)
-                r.Add(name + ":" + value);
-            else
-            {
-                r.Add(name);
-                r.Add(value);
-            }
-        }
+      
     }
 
     public void Run()
@@ -115,29 +105,27 @@ public class DotnetPublishCli
                 f2.Delete();
     }
 
-    #region Properties
-
     public DotnetVerbs Verb { get; set; } = DotnetVerbs.Publish;
 
     public List<string> NonstandardCommandLineparameters { get; } = new();
 
-    public string SlnFile { get; set; }
+    public string? SlnFile { get; set; }
 
     public bool Nodependencies { get; set; }
 
     public DebugOrRelease Configuration { get; set; }
 
-    public string Runtime { get; set; }
+    public string? Runtime { get; set; }
 
     /// <summary>
     ///     The directory in which to place the published artifacts.
     /// </summary>
-    public string OutputDir { get; set; }
+    public string? OutputDir { get; set; }
 
     /// <summary>
     ///     The target framework to publish for.
     /// </summary>
-    public string Framework { get; set; }
+    public string? Framework { get; set; }
 
     /// <summary>
     ///     Publishes the application as a self-contained application.
@@ -153,8 +141,8 @@ public class DotnetPublishCli
     public Func<FileInfo, bool> AcceptFileAfterBuild { get; set; }
 
     public CompilerWarningsContainer NoWarn { get; set; } = new();
-
-    #endregion
+    
+    public MsBuildConfig? MsBuild { get; set; } 
 
     /*
     public string VersionSuffix                  { get; set; }
