@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{79C5AD43-FE71-40BB-9A88-C809B2AFE008}</ProjectGuid>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <AssemblyVersion>1.25.925.8</AssemblyVersion>
     <FileVersion>1.25.925.8</FileVersion>
     <Version>1.25.925.8</Version>
