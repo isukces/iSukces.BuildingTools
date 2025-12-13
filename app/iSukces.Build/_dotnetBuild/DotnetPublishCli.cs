@@ -15,16 +15,16 @@ public class DotnetPublishCli
             case ".exe" or ".dll": return true;
             case ".json":
                 var name = baseName + ".deps.json";
-                if (Equals(name)) return true;
+                if (EqualsCi(name)) return true;
                 name = baseName + ".runtimeconfig.json";
-                return Equals(name);
+                return EqualsCi(name);
             case ".config":
-                return Equals(baseName + ".dll.config");
+                return EqualsCi(baseName + ".dll.config");
         }
 
         return true;
 
-        bool Equals(string name)
+        bool EqualsCi(string name)
         {
             return string.Equals(file.Name, name, StringComparison.OrdinalIgnoreCase);
         }
@@ -60,11 +60,13 @@ public class DotnetPublishCli
                 r.AddNotNull("/m:", MsBuild.MaxCpuCount);
             }
         }
+        if (!string.IsNullOrEmpty(Configfile))
+            r.Add("--configfile", Configfile);
+        if (!NuGetAudit)
+            r.Add("-p:NuGetAudit=false");
 
         r.AddRange(NonstandardCommandLineparameters);
         return r;
-
-      
     }
 
     public void Run()
@@ -141,8 +143,11 @@ public class DotnetPublishCli
     public Func<FileInfo, bool> AcceptFileAfterBuild { get; set; }
 
     public CompilerWarningsContainer NoWarn { get; set; } = new();
-    
-    public MsBuildConfig? MsBuild { get; set; } 
+
+    public MsBuildConfig? MsBuild { get; set; }
+
+    public string? Configfile { get; set; }
+    public bool    NuGetAudit { get; set; } = true;
 
     /*
     public string VersionSuffix                  { get; set; }
@@ -188,4 +193,5 @@ public enum DotnetVerbs
 {
     Publish,
     Build,
+    Restore
 }

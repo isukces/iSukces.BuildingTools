@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace iSukces.Build;
 
-public class CompilerWarningsContainer
+public sealed class CompilerWarningsContainer
 {
-    public HashSet<string> Items { get; } = new HashSet<string>();
+    public HashSet<string> Items { get; } = new();
 
     public string Separator { get; set; } = ";";
 
@@ -27,7 +27,7 @@ public class CompilerWarningsContainer
         }
     }
 
-    static bool IsAnumber(string s)
+    private static bool IsAnumber(string s)
     {
         if (string.IsNullOrEmpty(s))
             return false;
@@ -37,11 +37,19 @@ public class CompilerWarningsContainer
         return true;
     }
 
-    public override string ToString() =>
-        string.Join(";", Items.OrderBy(a => a));
+    public override string ToString()
+    {
+        return string.Join(";", Items.OrderBy(a => a));
+    }
 
     public void Add(string s)
     {
         Items.Add(s);
+    }
+
+    public void AddRange(IEnumerable<string> items)
+    {
+        foreach (var s in items)
+            Items.Add(s);
     }
 }
