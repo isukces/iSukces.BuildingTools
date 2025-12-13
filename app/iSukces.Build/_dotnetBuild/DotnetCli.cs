@@ -4,7 +4,12 @@ using System.IO;
 
 namespace iSukces.Build;
 
+[Obsolete("use DotnetCli instead", true)]
 public class DotnetPublishCli
+{
+    
+}
+public class DotnetCli
 {
     public static bool StandardFilter(FileInfo file, string baseName)
     {
@@ -32,25 +37,35 @@ public class DotnetPublishCli
 
     public List<string> GetCommandLineparameters()
     {
-        var r = new XBuilder();
+        var isPublish = Verb is DotnetVerbs.Publish or DotnetVerbs.Build;
+        
+        var r         = new XBuilder();
         r.Add(Verb.ToString().ToLower());
         r.Add(SlnFile);
-        r.Add("--configuration", Configuration.ToString().ToLower());
-        if (Verb == DotnetVerbs.Publish)
-            r.Add("--runtime", Runtime);
-        r.Add("--framework", Framework);
 
-        r.Add2(Force, "--force");
-        r.Add2(NoLogo, "--nologo");
-        r.Add2(NoRestore, "--no-restore");
-        r.Add2(NoBuild, "--no-build");
-        r.Add2(Nodependencies, "--no-dependencies");
-        if (SelfContained)
-            r.Add("--self-contained", SelfContained.ToString().ToLower());
-        else
-            r.Add("--no-self-contained");
 
-        r.Add("--output", OutputDir);
+        if (isPublish)
+        {
+            r.Add("--configuration", Configuration.ToString().ToLower());
+
+
+            if (Verb == DotnetVerbs.Publish)
+                r.Add("--runtime", Runtime);
+            r.Add("--framework", Framework);
+
+            r.Add2(Force, "--force");
+            r.Add2(NoLogo, "--nologo");
+            r.Add2(NoRestore, "--no-restore");
+            r.Add2(NoBuild, "--no-build");
+            r.Add2(Nodependencies, "--no-dependencies");
+            if (SelfContained)
+                r.Add("--self-contained", SelfContained.ToString().ToLower());
+            else
+                r.Add("--no-self-contained");
+
+            r.Add("--output", OutputDir);
+        }
+
         r.Add("--nowarn", NoWarn.AsDotnetBuild, true);
         {
             if (MsBuild is not null)
@@ -65,23 +80,33 @@ public class DotnetPublishCli
         if (!NuGetAudit)
             r.Add("-p:NuGetAudit=false");
 
+        if (Interactive)
+            r.Add("--interactive");
+
         r.AddRange(NonstandardCommandLineparameters);
         return r;
     }
 
     public void Run()
     {
-        var clone = (DotnetPublishCli)MemberwiseClone();
-        if (string.IsNullOrEmpty(clone.OutputDir))
-            throw new Exception("OutputDir is not set");
+        var clone = (DotnetCli)MemberwiseClone();
+
+        var isPublish = clone.Verb is DotnetVerbs.Publish or DotnetVerbs.Build;
+        if (isPublish)
+        {
+            if (string.IsNullOrEmpty(clone.OutputDir))
+                throw new Exception("OutputDir is not set");
+        }
+
         if (string.IsNullOrEmpty(clone.SlnFile))
             throw new Exception("SlnFile is not set");
 
         var tmp = ExeRunner.WorkingDir;
         if (!string.IsNullOrEmpty(tmp))
         {
-            clone.SlnFile   = Path.Combine(tmp, clone.SlnFile);
-            clone.OutputDir = Path.Combine(tmp, clone.OutputDir);
+            clone.SlnFile = Path.Combine(tmp, clone.SlnFile);
+            if (!string.IsNullOrEmpty(clone.OutputDir))
+                clone.OutputDir = Path.Combine(tmp, clone.OutputDir);
         }
 
         var f = new FileInfo(clone.SlnFile);
@@ -91,20 +116,27 @@ public class DotnetPublishCli
             clone.SlnFile        = f.Name;
         }
 
-        var od = new DirectoryInfo(clone.OutputDir);
-        if (od.Exists)
-            BuildUtils.Clear(od);
-        else
-            od.Create();
+        DirectoryInfo? od = null;
+        if (isPublish && !string.IsNullOrEmpty(clone.OutputDir))
+        {
+            od = new DirectoryInfo(clone.OutputDir);
+            if (od.Exists)
+                BuildUtils.Clear(od);
+            else
+                od.Create();
+        }
 
         var pList = clone.GetCommandLineparameters().ToArray();
         ExeRunner.Execute("dotnet", pList);
         ExeRunner.WorkingDir = tmp;
 
-        if (AcceptFileAfterBuild is null) return;
-        foreach (var f2 in od.GetFiles("*.*", SearchOption.AllDirectories))
-            if (!AcceptFileAfterBuild(f2))
-                f2.Delete();
+        if (od is not null)
+        {
+            if (AcceptFileAfterBuild is null) return;
+            foreach (var f2 in od.GetFiles("*.*", SearchOption.AllDirectories))
+                if (!AcceptFileAfterBuild(f2))
+                    f2.Delete();
+        }
     }
 
     public DotnetVerbs Verb { get; set; } = DotnetVerbs.Publish;
@@ -140,14 +172,16 @@ public class DotnetPublishCli
     public bool NoRestore { get; set; }
     public bool NoLogo    { get; set; }
 
-    public Func<FileInfo, bool> AcceptFileAfterBuild { get; set; }
+    public Func<FileInfo, bool>? AcceptFileAfterBuild { get; set; }
 
     public CompilerWarningsContainer NoWarn { get; set; } = new();
 
     public MsBuildConfig? MsBuild { get; set; }
 
     public string? Configfile { get; set; }
+    
     public bool    NuGetAudit { get; set; } = true;
+    public bool    Interactive { get; set; }
 
     /*
     public string VersionSuffix                  { get; set; }

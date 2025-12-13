@@ -13,6 +13,8 @@ public static class ExeRunner
         return Execute(null, exe, args);
     }
 
+    public static string? LastRunningCommand { get; set; }
+
     public static int Execute(IEnumerable<int>? ignoreErrorCodes, string exe, params string[] args)
     {
         var p = new Process
@@ -28,7 +30,10 @@ public static class ExeRunner
         };
 
         // Redirect the output stream of the child process.
-        ExConsole.WriteLine("Starting {0} {1}", new Filename(p.StartInfo.FileName), p.StartInfo.Arguments);
+        LastRunningCommand = string.Format("{0} {1}", 
+            new Filename(p.StartInfo.FileName).Name.CliQuoteIfNecessary(),
+            p.StartInfo.Arguments);
+        ExConsole.WriteLine("Starting {0}", LastRunningCommand);
         p.Start();
 
         while (true)
@@ -64,12 +69,12 @@ public static class ExeRunner
         }
     }
 
-    static bool wasSet;
+    private static bool wasSet;
 }
 
 public class RunException : Exception
 {
-    public RunException(string message, int exitCode, Exception innerException = null)
+    public RunException(string message, int exitCode, Exception? innerException = null)
         : base(message, innerException)
     {
         ExitCode = exitCode;

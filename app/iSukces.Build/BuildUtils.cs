@@ -6,10 +6,26 @@ namespace iSukces.Build;
 
 public static class BuildUtils
 {
+    public static void ClearDirButNotDelete(string dir)
+    {
+        var di = new DirectoryInfo(dir);
+        if (!di.Exists) 
+            return;
+        foreach (var i in di.GetFiles())
+            i.Delete();
+        foreach (var i in di.GetDirectories())
+            i.Delete(true);
+    }
+    
     public static IEnumerable<string> AssemblyRelatedFiles(string baseName, bool addBaseName)
     {
         if (addBaseName)
             yield return baseName;
+
+        yield return AddAlso("pdb", true);
+        yield return AddAlso("config", false);
+        yield return AddAlso("xml", true);
+        yield break;
 
         string AddAlso(string ext, bool cut)
         {
@@ -17,10 +33,6 @@ public static class BuildUtils
                 return ChangeFileExtension(baseName, ext);
             return baseName + "." + ext;
         }
-
-        yield return AddAlso("pdb", true);
-        yield return AddAlso("config", false);
-        yield return AddAlso("xml", true);
     }
 
     public static string ChangeFileExtension(string file, string ext)
@@ -43,12 +55,12 @@ public static class BuildUtils
             i.Delete(true);
     }
 
-    public static void ClearBinObj(DirectoryInfo dir, HashSet<string> skipClearBinObj = null)
+    public static void ClearBinObj(DirectoryInfo dir, HashSet<string>? skipClearBinObj = null)
     {
         ClearBinObj(dir, false, skipClearBinObj);
     }
 
-    private static void ClearBinObj(DirectoryInfo dir, bool delete, HashSet<string> skipClearBinObj)
+    private static void ClearBinObj(DirectoryInfo dir, bool delete, HashSet<string>? skipClearBinObj)
     {
         if (skipClearBinObj is not null && skipClearBinObj.Contains(dir.FullName))
             return;
@@ -69,18 +81,14 @@ public static class BuildUtils
 
         if (IsBinObj(dir)) return;
         dir.Delete();
-        Console.WriteLine("Delete " + dir.FullName);
+        if (DisplayDeletedFolders)
+            Console.WriteLine("Delete " + dir.FullName);
     }
 
     [Obsolete("Use CliQuoteIfNecessary extension method instead", true)]
     public static string Encode(string parameter)
     {
         return parameter.CliQuoteIfNecessary();
-        /*
-        if (ShouldBeEncoded(parameter))
-            return Quote(parameter);
-        return parameter;
-    */
     }
 
     private static bool IsBinObj(DirectoryInfo directory)
@@ -93,10 +101,6 @@ public static class BuildUtils
         return $"\"{parameter}\"";
     }
 
-    /*private static bool ShouldBeEncoded(string parameter)
-    {
-        return parameter.Contains(' ', StringComparison.Ordinal);
-    }*/
-
     public static bool DisplayDeletedFiles { get; set; } = true;
+    public static bool DisplayDeletedFolders { get; set; } = true;
 }

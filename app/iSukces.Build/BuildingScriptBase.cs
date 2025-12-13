@@ -33,10 +33,12 @@ public class BuildingScriptBase : IRollbackContainer
         }
     }
 
-    protected void A03_CompileMsBuildAndNuget()
+    protected void A03_CompileMsBuildAndNuget(
+        Action<MsBuildCli>? msBuildConfig = null,
+        Action<DotnetCli>? restoreConfig = null)
     {
         var start   = DateTime.Now;
-        var msBuild = new MsBuild();
+        var msBuild = new MsBuildCli();
         try
         {
             msBuild.Exe           = Configuration.MsBuild;
@@ -56,9 +58,16 @@ public class BuildingScriptBase : IRollbackContainer
 
         try
         {
+            var cli = new DotnetCli
+            {
+                Verb    = DotnetVerbs.Restore,
+                SlnFile = Configuration.SolutionShortFileName
+            };
+            restoreConfig?.Invoke(cli);
+            cli.Run();
             // nuget restore
             // ExeRunner.Execute(Configuration.Nuget, "restore", Configuration.SolutionShortFileName);
-            ExeRunner.Execute("dotnet", "restore", Configuration.SolutionShortFileName);
+            //ExeRunner.Execute("dotnet", "restore", Configuration.SolutionShortFileName);
         }
         catch (Exception e)
         {
@@ -70,6 +79,7 @@ public class BuildingScriptBase : IRollbackContainer
         {
             // build
             msBuild.Target = "Build";
+            msBuildConfig?.Invoke(msBuild);
             msBuild.Run();
             ExConsole.WriteLine("Compile time {0}", DateTime.Now - start);
         }
@@ -79,6 +89,8 @@ public class BuildingScriptBase : IRollbackContainer
             throw;
         }
 
+        return;
+
         void Log(Exception e, string command)
         {
             ExConsole.WriteLine("Error running command");
@@ -87,9 +99,9 @@ public class BuildingScriptBase : IRollbackContainer
         }
     }
 
-    protected void A03_DotnetPublish(Action<DotnetPublishCli>? configure)
+    protected void A03_DotnetPublish(Action<DotnetCli>? configure)
     {
-        var cli = new DotnetPublishCli
+        var cli = new DotnetCli
         {
             SlnFile       = Path.Combine(Configuration.SlnDir.FullName, Configuration.SolutionShortFileName),
             Configuration = Configuration.BuildConfiguration,
