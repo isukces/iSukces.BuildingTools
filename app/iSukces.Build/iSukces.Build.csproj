@@ -3,9 +3,9 @@
   <PropertyGroup>
     <ProjectGuid>{79C5AD43-FE71-40BB-9A88-C809B2AFE008}</ProjectGuid>
     <TargetFrameworks>net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
-    <AssemblyVersion>1.25.1214.10</AssemblyVersion>
-    <FileVersion>1.25.1214.10</FileVersion>
-    <Version>1.25.1214.10</Version>
+    <AssemblyVersion>1.26.211.11</AssemblyVersion>
+    <FileVersion>1.26.211.11</FileVersion>
+    <Version>1.26.211.11</Version>
     <LangVersion>13</LangVersion>
     <Nullable>enable</Nullable>
     <SignAssembly>true</SignAssembly>
@@ -30,7 +30,8 @@
     <WarningsAsErrors>0659,0661,105,108,1570,1572,1574,1587,162,168,169,1718,1734,219,3245,414,628,649,693,8321</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="InnoSetup\FileCommand.Parser.cs">
@@ -49,6 +50,9 @@
       <LastGenOutput>KnownCompilerDirectives.cs</LastGenOutput>
     </None>
     <None Remove="iSukces.Build.csproj.DotSettings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="System" />
   </ItemGroup>
   <Import Project="../CommonWindows.props" Condition="Exists('../CommonWindows.props')" />
 </Project>
