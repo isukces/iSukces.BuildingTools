@@ -12,3 +12,6 @@
 app/prv/
 app/*.bat
 app/iSukces.BuildingTools.sln.DotSettings.user
+.mcp.json
+.claude/
+.roo/

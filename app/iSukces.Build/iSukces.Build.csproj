@@ -30,7 +30,7 @@
     <WarningsAsErrors>0659,0661,105,108,1570,1572,1574,1587,162,168,169,1718,1734,219,3245,414,628,649,693,8321</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.203" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
@@ -50,8 +50,6 @@
       <LastGenOutput>KnownCompilerDirectives.cs</LastGenOutput>
     </None>
     <None Remove="iSukces.Build.csproj.DotSettings" />
-  </ItemGroup>
-  <ItemGroup>
     <Using Include="System" />
   </ItemGroup>
   <Import Project="../CommonWindows.props" Condition="Exists('../CommonWindows.props')" />
