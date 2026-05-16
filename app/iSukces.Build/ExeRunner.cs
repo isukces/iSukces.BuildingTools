@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -13,9 +14,19 @@ public static class ExeRunner
         return Execute(null, exe, args);
     }
 
+    public static int Execute(string exe, EnvironmentVariables? variable, params string[] args)
+    {
+        return Execute(null, exe, variable, args);
+    }
+
     public static string? LastRunningCommand { get; set; }
 
     public static int Execute(IEnumerable<int>? ignoreErrorCodes, string exe, params string[] args)
+    {
+        return Execute(ignoreErrorCodes, exe, null, args);
+    }
+    
+    public static int Execute(IEnumerable<int>? ignoreErrorCodes, string exe, EnvironmentVariables? variables, params string[] args)
     {
         var p = new Process
         {
@@ -33,6 +44,22 @@ public static class ExeRunner
         LastRunningCommand = string.Format("{0} {1}", 
             new Filename(p.StartInfo.FileName).Name.CliQuoteIfNecessary(),
             p.StartInfo.Arguments);
+        if (variables is not null)
+        {
+            foreach (var (key, value) in variables)
+            {
+                p.StartInfo.EnvironmentVariables[key] = value;
+                var text = "Set environment "
+                           +ExConsole.Foreground(ConsoleColor.DarkYellow)
+                           + key 
+                           +ExConsole.Reset
+                           + "=" 
+                           +ExConsole.Foreground(ConsoleColor.Cyan)
+                           + value;
+                ExConsole.WriteLine(text);
+
+            }
+        }
         ExConsole.WriteLine("Starting {0}", LastRunningCommand);
         p.Start();
 

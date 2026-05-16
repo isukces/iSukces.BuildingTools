@@ -24,6 +24,8 @@ public static class ExConsole
 
         if (value is TimeSpan)
             return Background(ConsoleColor.DarkGray) + Foreground(ConsoleColor.Cyan);
+        if (value is int or double)
+            return Foreground(ConsoleColor.Green);
 
         return null;
     }

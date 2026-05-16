@@ -4,7 +4,6 @@ public class CompilerDirectiveUpdaterTest
 {
     [Theory]
     [InlineData("", "")]
-    //[InlineData("UNSET", "")]
     public void Test1(string input, string expected)
     {
         var op = new CommandLine
@@ -12,7 +11,7 @@ public class CompilerDirectiveUpdaterTest
             Directives =
             {
                 ["UNSET"] = false,
-                ["SET"]   = true,
+                ["SET"]   = true
             }
         };
 
