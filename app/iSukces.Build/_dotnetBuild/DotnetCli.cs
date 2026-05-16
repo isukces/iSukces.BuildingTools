@@ -126,7 +126,8 @@ public class DotnetCli
         }
 
         var pList = clone.GetCommandLineparameters().ToArray();
-        ExeRunner.Execute("dotnet", pList);
+        
+        ExeRunner.Execute("dotnet", EnvironmentVariables, pList);
         ExeRunner.WorkingDir = tmp;
 
         if (od is not null)
@@ -139,6 +140,8 @@ public class DotnetCli
     }
 
     public DotnetVerbs Verb { get; set; } = DotnetVerbs.Publish;
+    
+    public EnvironmentVariables? EnvironmentVariables { get; set; }
 
     public List<string> NonstandardCommandLineparameters { get; } = new();
 

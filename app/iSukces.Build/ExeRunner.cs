@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -14,9 +12,9 @@ public static class ExeRunner
         return Execute(null, exe, args);
     }
 
-    public static int Execute(string exe, EnvironmentVariables? variable, params string[] args)
+    public static int Execute(string exe, EnvironmentVariables? variables, params string[] args)
     {
-        return Execute(null, exe, variable, args);
+        return Execute(null, exe, variables, args);
     }
 
     public static string? LastRunningCommand { get; set; }

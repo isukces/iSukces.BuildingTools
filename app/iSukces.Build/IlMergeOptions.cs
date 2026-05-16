@@ -136,7 +136,7 @@ public class IlMergeOptions
                 }
             }
             var commandLineArguments = GetCommandLineArguments(Path.Combine(tmpFolder, OutputExe), false, false);
-            var parameters           = string.Join(" ", commandLineArguments);
+            //var parameters           = string.Join(" ", commandLineArguments);
             ExeRunner.Execute(IlmergeExe, commandLineArguments);
 
             void Move(string file)

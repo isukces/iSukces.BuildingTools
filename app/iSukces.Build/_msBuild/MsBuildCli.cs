@@ -47,7 +47,7 @@ public class MsBuildCli : MsBuildConfig
         var pList = par.ToArray();
         LastCommand          = Exe.CliQuoteIfNecessary() + " " + string.Join(" ", pList);
         ExeRunner.WorkingDir = solution.Directory.FullName;
-        ExeRunner.Execute(Exe, pList);
+        ExeRunner.Execute(Exe, EnvironmentVariables, pList);
         return;
 
         void Add1(string key, bool? value)
@@ -75,11 +75,12 @@ public class MsBuildCli : MsBuildConfig
     public string? PublishDir        { get; set; }
     public string? RuntimeIdentifier { get; set; }
     public string? Solution          { get; set; }
-    
+
     public bool? SelfContained               { get; set; }
     public bool? UseCurrentRuntimeIdentifier { get; set; }
     public bool? PublishReadyToRun           { get; set; }
-    
-    
-    public List<string> NonstandardCommandLineparameters { get; } = [];
+
+
+    public List<string>          NonstandardCommandLineparameters { get; } = [];
+    public EnvironmentVariables? EnvironmentVariables             { get; set; }
 }
